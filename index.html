@@ -1,0 +1,2112 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض صور حفلة النجاح</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        /* الأنماط الأساسية للجسم والخطوط والخلفية */
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #f0f4f8;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+            color: #333; /* لون نص افتراضي للجسم */
+        }
+
+        /* حاوية عرض الشرائح الرئيسية */
+        .slideshow-container {
+            position: relative;
+            height: 100vh; /* ارتفاع كامل للشاشة */
+            width: 100%;
+            overflow: hidden;
+            background-color: #000; /* خلفية سوداء افتراضية للشرائح */
+        }
+
+        /* نمط الشريحة الفردية */
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0; /* مخفية في البداية */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white; /* لون النص الافتراضي للشرائح */
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* ظل للنص لتحسين القراءة */
+            /* أنماط افتراضية للخلفية إذا لم يتم تحديدها */
+            background-size: cover;
+            background-position: center;
+            transition: all 1s ease-in-out; /* انتقال سلس للشفافية والتأثيرات الأخرى */
+        }
+
+        /* نمط الشريحة النشطة */
+        .slide.active {
+            opacity: 1; /* مرئية عند التنشيط */
+            z-index: 1; /* لجعل الشريحة النشطة فوق الأخرى */
+        }
+
+        /* أنماط المؤثرات الانتقالية */
+        .slide.fade-in {
+            animation: fadeIn 1s forwards;
+        }
+        .slide.fade-out {
+            animation: fadeOut 1s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+
+        .slide.slide-left {
+            transform: translateX(100%);
+        }
+        .slide.active.slide-left {
+            animation: slideInLeft 1s forwards;
+        }
+        @keyframes slideInLeft {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .slide.slide-right {
+            transform: translateX(-100%);
+        }
+        .slide.active.slide-right {
+            animation: slideInRight 1s forwards;
+        }
+        @keyframes slideInRight {
+            from { transform: translateX(-100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .slide.zoom-in {
+            transform: scale(0.5);
+            opacity: 0;
+        }
+        .slide.active.zoom-in {
+            animation: zoomIn 1s forwards;
+        }
+        @keyframes zoomIn {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .slide.rotate-in {
+            transform: rotateY(90deg);
+            opacity: 0;
+        }
+        .slide.active.rotate-in {
+            animation: rotateIn 1s forwards;
+        }
+        @keyframes rotateIn {
+            from { transform: rotateY(90deg); opacity: 0; }
+            to { transform: rotateY(0deg); opacity: 1; }
+        }
+
+        /* نمط الأزرار للتنقل بين الشرائح */
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 16px;
+            margin-top: -22px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 10;
+        }
+
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .prev {
+           left: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .prev:hover, .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+
+        /* نمط المؤشرات (النقاط) */
+        .dots-container {
+            text-align: center;
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            z-index: 10;
+        }
+
+        .dot {
+            cursor: pointer;
+            height: 15px;
+            width: 15px;
+            margin: 0 2px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            transition: background-color 0.6s ease;
+        }
+
+        .dot.active, .dot:hover {
+            background-color: #717171;
+        }
+
+        /* أنماط خاصة لأنواع الشرائح */
+        .slide.text-slide {
+            background-color: rgba(0, 0, 0, 0.6); /* خلفية داكنة للنصوص */
+            padding: 20px;
+            text-align: center;
+        }
+
+        .slide.text-slide h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .slide.text-slide p {
+            font-size: 1.5em;
+        }
+
+        .slide.student-slide {
+            flex-direction: column;
+            text-align: center;
+            justify-content: center; /* توسيط عمودي */
+            align-items: center; /* توسيط أفقي */
+            background-color: rgba(0, 0, 0, 0.6); /* خلفية داكنة للطالب */
+        }
+
+        /* الصورة نفسها داخل شريحة الطالب */
+        .slide.student-slide img {
+            display: block; /* لجعلها تأخذ مساحة خاصة بها */
+            margin: 0 auto 20px auto; /* توسيط الصورة مع هامش سفلي */
+            border: 5px solid white; /* إطار أبيض حول الصورة */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4); /* ظل خفيف */
+        }
+
+        /* نمط الصورة الدائرية للطالب */
+        .student-image.circle {
+            border-radius: 50%;
+            width: 250px; /* حجم ثابت للدائرة */
+            height: 250px; /* حجم ثابت للدائرة */
+            object-fit: cover; /* لضمان ملء الصورة للدائرة */
+        }
+
+        /* نمط الصورة المستطيلة للطالب (4*6 تقريبي) */
+        .student-image.rectangle {
+            width: 250px; /* عرض تقديري */
+            height: 375px; /* ارتفاع تقديري لنسبة 4:6 (إذا كان العرض 250، الارتفاع 250 * 1.5 = 375) */
+            object-fit: cover; /* لضمان ملء الصورة للمستطيل */
+        }
+
+.slide.image-slide {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.6); /* خلفية خلف الصورة */
+    padding: 20px; /* مسافة حول الصورة لظهور الخلفية */
+}
+
+.slide.image-slide img {
+    max-width: 60%; /* ✅ عرض أقصى 60% */
+    max-height: 60vh; /* ✅ ارتفاع أقصى 60% من الشاشة */
+    height: auto;
+    border: 5px solid white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    margin-bottom: 10px;
+}
+
+.slide.image-slide .image-title {
+    font-size: 2em;
+    color: white;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.slide.image-slide .image-caption {
+    position: absolute;
+    bottom: 50px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 1.2em;
+    color: white;
+}
+        /* لوحة الإعدادات */
+        .settings-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 350px; /* زيادة العرض */
+            height: 100vh;
+            background-color: #2d3748; /* خلفية داكنة للوحة التحكم */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 20;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease-in-out;
+            color: #e2e8f0; /* لون نص فاتح */
+        }
+
+        .settings-panel.open {
+            transform: translateX(0);
+        }
+
+        .settings-toggle-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 21;
+            background-color: #4a5568; /* لون زر الإعدادات */
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.2s ease;
+        }
+
+        .settings-toggle-btn:hover {
+            background-color: #2d3748;
+        }
+
+        .settings-panel label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #cbd5e0; /* لون نص التسمية */
+        }
+
+        .settings-panel input[type="text"],
+        .settings-panel input[type="number"],
+        .settings-panel textarea,
+        .settings-panel select,
+        .settings-panel input[type="color"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #4a5568; /* حدود أغمق قليلاً */
+            border-radius: 4px;
+            box-sizing: border-box;
+            background-color: #1a202c; /* خلفية حقول الإدخال */
+            color: #e2e8f0; /* لون نص حقول الإدخال */
+        }
+
+        .settings-panel input[type="file"] {
+            color: #cbd5e0;
+        }
+
+        .settings-panel button {
+            background-color: #4299e1; /* لون أزرق موحد للأزرار */
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: background-color 0.2s ease;
+        }
+
+        .settings-panel button:hover {
+            background-color: #3182ce;
+        }
+
+        /* ألوان مخصصة لبعض الأزرار */
+        .settings-panel button.bg-green-600 { background-color: #38a169; }
+        .settings-panel button.bg-green-600:hover { background-color: #2f855a; }
+        .settings-panel button.bg-indigo-600 { background-color: #667eea; }
+        .settings-panel button.bg-indigo-600:hover { background-color: #5a67d8; }
+        .settings-panel button.bg-purple-600 { background-color: #805ad5; }
+        .settings-panel button.bg-purple-600:hover { background-color: #6b46c1; }
+        .settings-panel button.bg-orange-600 { background-color: #ed8936; }
+        .settings-panel button.bg-orange-600:hover { background-color: #dd6b20; }
+        .settings-panel button.bg-blue-500 { background-color: #4299e1; }
+        .settings-panel button.bg-blue-500:hover { background-color: #3182ce; }
+        .settings-panel button.bg-gray-500 { background-color: #a0aec0; }
+        .settings-panel button.bg-gray-500:hover { background-color: #718096; }
+        .settings-panel button.bg-teal-600 { background-color: #319795; }
+        .settings-panel button.bg-teal-600:hover { background-color: #2c7a7b; }
+        .settings-panel button.bg-yellow-600 { background-color: #d69e2e; }
+        .settings-panel button.bg-yellow-600:hover { background-color: #b7791f; }
+        .settings-panel button.bg-red-600 { background-color: #e53e3e; }
+        .settings-panel button.bg-red-600:hover { background-color: #c53030; }
+
+
+        .slides-list {
+            margin-top: 20px;
+            border-top: 1px solid #4a5568;
+            padding-top: 10px;
+        }
+
+        .slides-list div {
+            background-color: #1a202c; /* خلفية عناصر القائمة */
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9em;
+            color: #e2e8f0;
+            border: 1px solid #4a5568;
+        }
+
+        .slides-list .slide-item-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-grow: 1;
+        }
+
+        .slides-list .slide-thumbnail {
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid #667eea;
+        }
+        .slides-list .slide-thumbnail.circle {
+            border-radius: 50%;
+        }
+
+        .slides-list .slide-controls button {
+            width: auto;
+            margin-left: 5px;
+            padding: 5px 8px;
+            background-color: #c53030; /* لون الحذف */
+            font-size: 0.8em;
+        }
+        .slides-list .slide-controls button.move-btn {
+            background-color: #4299e1; /* لون أزرار النقل */
+        }
+        .slides-list .slide-controls button:hover {
+            opacity: 0.8;
+        }
+
+
+        .message-box {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            font-size: 0.9em;
+        }
+
+        .message-box.show {
+            opacity: 1;
+        }
+
+        .image-preview {
+            max-width: 100%;
+            max-height: 150px;
+            display: block;
+            margin-top: 10px;
+            border: 1px solid #4a5568;
+            border-radius: 4px;
+        }
+
+        /* التذييل */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+            font-size: 1em;
+            z-index: 15;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* ألوان أقسام لوحة التحكم الداخلية */
+        .settings-panel .p-3.border.rounded-lg {
+            background-color: #1a202c; /* خلفية داخلية للقسم */
+            border-color: #4a5568; /* حدود القسم */
+        }
+        .settings-panel .p-3.border.rounded-lg h3 {
+            color: #cbd5e0; /* لون عنوان القسم */
+        }
+        .settings-panel .p-3.border.rounded-lg label {
+            color: #a0aec0; /* لون التسميات داخل القسم */
+        }
+        .settings-panel .p-3.border.rounded-lg input,
+        .settings-panel .p-3.border.rounded-lg textarea,
+        .settings-panel .p-3.border.rounded-lg select {
+            background-color: #2d3748; /* خلفية حقول الإدخال داخل القسم */
+            color: #e2e8f0;
+            border-color: #4a5568;
+        }
+        .settings-panel .p-3.border.rounded-lg input[type="file"] {
+            color: #a0aec0;
+        }
+        .settings-panel .p-3.border.rounded-lg button {
+            background-color: #4299e1;
+            color: white;
+        }
+
+        .slideshow-container {
+    background-color: #000; /* خلفية سوداء افتراضية للشرائح */
+}
+
+/* flip-horizontal */
+.flip-horizontal {
+    transform: rotateY(180deg);
+    opacity: 0;
+}
+.flip-horizontal.active {
+    animation: flipHorizontal 1s forwards;
+}
+@keyframes flipHorizontal {
+    from { transform: rotateY(180deg); opacity: 0; }
+    to { transform: rotateY(0); opacity: 1; }
+}
+
+/* flip-vertical */
+.flip-vertical {
+    transform: rotateX(180deg);
+    opacity: 0;
+}
+.flip-vertical.active {
+    animation: flipVertical 1s forwards;
+}
+@keyframes flipVertical {
+    from { transform: rotateX(180deg); opacity: 0; }
+    to { transform: rotateX(0); opacity: 1; }
+}
+
+/* bounce-in */
+.bounce-in {
+    transform: scale(0.3);
+    opacity: 0;
+}
+.bounce-in.active {
+    animation: bounceIn 1s forwards;
+}
+@keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    50% { transform: scale(1.1); opacity: 1; }
+    70% { transform: scale(0.9); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+/* blur-in */
+.blur-in {
+    filter: blur(10px);
+    opacity: 0;
+}
+.blur-in.active {
+    animation: blurIn 1s forwards;
+}
+@keyframes blurIn {
+    from { filter: blur(10px); opacity: 0; }
+    to { filter: blur(0); opacity: 1; }
+}
+
+/* rotate-scale-in */
+.rotate-scale-in {
+    transform: rotate(-360deg) scale(0);
+    opacity: 0;
+}
+.rotate-scale-in.active {
+    animation: rotateScaleIn 1s forwards;
+}
+@keyframes rotateScaleIn {
+    from { transform: rotate(-360deg) scale(0); opacity: 0; }
+    to { transform: rotate(0) scale(1); opacity: 1; }
+}
+ </style>
+</head>
+<body>
+    <div class="slideshow-container" id="slideshowContainer"></div>
+    <div class="footer" id="mainFooter"></div>
+
+    <div class="settings-toggle-btn" id="settingsToggleBtn">الإعدادات</div>
+
+    <div class="settings-panel" id="settingsPanel">
+        <h2 class="text-2xl font-bold mb-4 text-gray-100">إعدادات العرض</h2>
+
+        <!-- الخلفية العامة -->
+        <div class="mb-4 p-3 border rounded-lg">
+            <h3 class="font-semibold text-lg mb-2">الخلفية العامة</h3>
+            <label for="backgroundImageUrlInput">رابط صورة الخلفية:</label>
+            <input type="text" id="backgroundImageUrlInput" placeholder="أو ارفع ملفاً">
+            <input type="file" id="backgroundFileInput" accept="image/*" class="mt-2 text-sm">
+            <img id="backgroundPreview" class="image-preview" style="display: none;">
+            <button id="updateBackgroundBtn" class="bg-green-600 hover:bg-green-700">تحديث الخلفية</button>
+        </div>
+
+        <!-- إضافة شريحة طالب -->
+        <div class="mb-4 p-3 border rounded-lg">
+            <h3 class="font-semibold text-lg mb-2">إضافة شريحة طالب</h3>
+            <label for="studentNameInput">اسم الطالب:</label>
+            <input type="text" id="studentNameInput" placeholder="اسم الطالب">
+            <label for="studentCommentInput">تعليق:</label>
+            <textarea id="studentCommentInput" placeholder="تهانينا على تخرجه!"></textarea>
+            <label for="studentImageUrlInput">رابط صورة الطالب:</label>
+            <input type="text" id="studentImageUrlInput" placeholder="أو ارفع ملفاً">
+            <input type="file" id="studentFileInput" accept="image/*" class="mt-2 text-sm">
+            <img id="studentPreview" class="image-preview" style="display: none;">
+            <label for="studentImageShapeInput">شكل الصورة:</label>
+            <select id="studentImageShapeInput" class="text-sm">
+                <option value="circle">دائرة (تركيز على الوجه)</option>
+                <option value="rectangle">مستطيل (مثال: 4x6)</option>
+            </select>
+            <button id="addStudentBtn" class="bg-indigo-600 hover:bg-indigo-700">إضافة طالب</button>
+        </div>
+
+        <!-- إضافة شريحة نصية -->
+        <div class="mb-4 p-3 border rounded-lg">
+            <h3 class="font-semibold text-lg mb-2">إضافة شريحة نصية</h3>
+            <label for="textTitleInput">العنوان:</label>
+            <input type="text" id="textTitleInput" placeholder="عنوان الشريحة">
+            <label for="textCommentInput">النص:</label>
+            <textarea id="textCommentInput" placeholder="نص الشريحة"></textarea>
+            <button id="addTextSlideBtn" class="bg-purple-600 hover:bg-purple-700">إضافة شريحة نصية</button>
+        </div>
+
+        <!-- إضافة شريحة صور عامة -->
+        <div class="mb-4 p-3 border rounded-lg">
+            <h3 class="font-semibold text-lg mb-2">إضافة شريحة صور عامة</h3>
+            <label for="imageUrlInput">رابط الصورة:</label>
+            <input type="text" id="imageUrlInput" placeholder="رابط الصورة">
+            <input type="file" id="imageFileInput" accept="image/*" class="mt-2 text-sm">
+            <img id="imagePreview" class="image-preview" style="display: none;">
+            <label for="imageCaptionInput">وصف الصورة (اختياري):</label>
+            <input type="text" id="imageCaptionInput" placeholder="وصف قصير للصورة">
+            <label for="imageTitleInput">عنوان الصورة (اختياري):</label>
+            <input type="text" id="imageTitleInput" placeholder="عنوان يظهر أعلى الصورة">
+            <button id="addImageBtn" class="bg-orange-600 hover:bg-orange-700">إضافة صورة</button>
+        </div>
+
+        <!-- الموسيقى الخلفية -->
+        <div class="mb-4 p-3 border rounded-lg">
+            <h3 class="font-semibold text-lg mb-2">الموسيقى الخلفية</h3>
+            <label for="backgroundMusicUrl">رابط المادة الصوتية (MP3/WAV):</label>
+            <input type="text" id="backgroundMusicUrl" placeholder="أو ارفع ملفاً">
+            <input type="file" id="backgroundMusicFileInput" accept="audio/*" class="mt-2 text-sm">
+            <div class="flex items-center gap-2 mt-2">
+                <label for="musicVolume">مستوى الصوت:</label>
+                <input type="range" id="musicVolume" min="0" max="1" step="0.01" value="0.5" class="flex-grow">
+                <span id="volumeValue" class="text-sm">50%</span>
+            </div>
+            <div class="flex gap-2 mt-2">
+                <button id="playMusicBtn" class="flex-1 bg-blue-500 hover:bg-blue-600">تشغيل</button>
+                <button id="pauseMusicBtn" class="flex-1 bg-gray-500 hover:bg-gray-600">إيقاف مؤقت</button>
+            </div>
+            <audio id="backgroundMusic" loop></audio>
+        </div>
+
+        <!-- التذييل -->
+        <div class="mb-4 p-3 border rounded-lg">
+            <h3 class="font-semibold text-lg mb-2">التذييل (القدم)</h3>
+            <label for="footerTextInput">نص التذييل:</label>
+            <input type="text" id="footerTextInput" placeholder="مثال: حفلة تخرج الدفعة 2024">
+            <label for="footerTextColorInput">لون نص التذييل:</label>
+            <input type="color" id="footerTextColorInput" value="#FFFFFF">
+            <label for="footerBgColorInput">لون خلفية التذييل:</label>
+            <input type="color" id="footerBgColorInput" value="#000000">
+            <button id="updateFooterBtn" class="bg-teal-600 hover:bg-teal-700">تحديث التذييل</button>
+        </div>
+
+        <!-- التحكم بالشرائح -->
+        <div class="mb-4 p-3 border rounded-lg">
+            <h3 class="font-semibold text-lg mb-2">التحكم بالشرائح</h3>
+            <label for="slideDurationInput">مدة عرض الشريحة (ثواني):</label>
+            <input type="number" id="slideDurationInput" value="5" min="1" class="mt-1 mb-2">
+
+            <p class="text-sm text-gray-400 mt-2">
+                يمكنك الآن التحكم في تأثير كل شريحة على حدة من خلال قائمة التأثيرات في كل شريحة.
+            </p>
+        </div>
+
+        <!-- التحكم بالعرض التقديمي -->
+        <div class="mb-4 p-3 border rounded-lg">
+            <h3 class="font-semibold text-lg mb-2 text-gray-200">التحكم بالعرض التقديمي</h3>
+            <button id="startSlideshowBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full mb-2">بدء العرض</button>
+            <button id="stopSlideshowBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full">إيقاف العرض</button>
+        </div>
+
+        <!-- الحفظ والتحميل -->
+        <button id="loadDefaultsBtn" class="bg-yellow-600 hover:bg-yellow-700">تحميل إعدادات افتراضية</button>
+        <button id="clearAllBtn" class="bg-red-600 hover:bg-red-700">مسح كل الشرائح</button>
+
+        <!-- قائمة الشرائح -->
+        <div class="slides-list" id="slidesList">
+            <h3 class="font-semibold text-lg mb-2">الشرائح المضافة:</h3>
+        </div>
+
+        <!-- توليد نسخة نهائية -->
+        <div class="mb-4 p-3 border rounded-lg">
+            <h3 class="font-semibold text-lg mb-2">توليد نسخة نهائية</h3>
+            <button id="generateFinalBtn" class="bg-purple-600 hover:bg-purple-700 w-full">توليد نسخة بدون لوحة تحكم</button>
+            <p class="text-sm text-gray-400 mt-2">سيتم إنشاء نسخة مستقلة تحتوي على العرض الحالي فقط</p>
+        </div>
+
+        <!-- حفظ وتحميل ملف JSON -->
+        <div class="flex flex-wrap justify-between gap-2 mt-4">
+            <button id="exportSettingsBtn" class="bg-purple-600 hover:bg-purple-700 flex-grow">حفظ العرض (JSON)</button>
+            <input type="file" id="loadFileInput" accept=".json" class="hidden">
+            <button id="loadFromFileBtn" class="bg-teal-600 hover:bg-teal-700 flex-grow">تحميل من ملف (JSON)</button>
+        </div>
+
+    </div> <!-- نهاية settings-panel -->
+
+    <!-- الرسائل -->
+    <div class="message-box" id="messageBox"></div>
+</body>
+
+    <script>
+        const slideshowContainer = document.getElementById('slideshowContainer');
+        const settingsToggleBtn = document.getElementById('settingsToggleBtn');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const startSlideshowBtn = document.getElementById('startSlideshowBtn');
+        const stopSlideshowBtn = document.getElementById('stopSlideshowBtn');
+        const SETTINGS_FILE_PATH = 'settings.json'; // المسار الافتراضي لملف الإعدادات
+
+        // عناصر التحكم بالطلاب
+        const studentNameInput = document.getElementById('studentNameInput');
+        const studentCommentInput = document.getElementById('studentCommentInput');
+        const studentImageUrlInput = document.getElementById('studentImageUrlInput');
+        const studentFileInput = document.getElementById('studentFileInput');
+        const studentPreview = document.getElementById('studentPreview');
+        const studentImageShapeInput = document.getElementById('studentImageShapeInput');
+        const addStudentBtn = document.getElementById('addStudentBtn');
+
+        // عناصر التحكم بالنصوص
+        const textTitleInput = document.getElementById('textTitleInput');
+        const textCommentInput = document.getElementById('textCommentInput');
+        const addTextSlideBtn = document.getElementById('addTextSlideBtn');
+
+        // عناصر التحكم بالصور العامة
+        const imageUrlInput = document.getElementById('imageUrlInput');
+        const imageFileInput = document.getElementById('imageFileInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const imageCaptionInput = document.getElementById('imageCaptionInput');
+        const imageTitleInput = document.getElementById('imageTitleInput');
+        const addImageBtn = document.getElementById('addImageBtn');
+
+        // عناصر التحكم بالمدة والحفظ
+        const slideDurationInput = document.getElementById('slideDurationInput');
+        const loadDefaultsBtn = document.getElementById('loadDefaultsBtn');
+        const clearAllBtn = document.getElementById('clearAllBtn');
+        // أزرار التصدير والاستيراد
+// أزرار الحفظ والتحميل من ملف
+        const exportSettingsBtn = document.getElementById('exportSettingsBtn');
+        const loadFileInput = document.getElementById('loadFileInput'); // يجب أن يكون هذا loadFileInput
+        const loadFromFileBtn = document.getElementById('loadFromFileBtn'); // يجب أن يكون هذا loadFromFileBtn
+        const slidesList = document.getElementById('slidesList');
+        const messageBox = document.getElementById('messageBox');
+        
+
+        // عناصر التحكم بالخلفية العامة
+        const backgroundImageUrlInput = document.getElementById('backgroundImageUrlInput');
+        const backgroundFileInput = document.getElementById('backgroundFileInput');
+        const backgroundPreview = document.getElementById('backgroundPreview');
+        const updateBackgroundBtn = document.getElementById('updateBackgroundBtn');
+
+        // عناصر التحكم بالموسيقى
+        const backgroundMusicElement = document.getElementById('backgroundMusic');
+        const backgroundMusicUrlInput = document.getElementById('backgroundMusicUrl');
+        const backgroundMusicFileInput = document.getElementById('backgroundMusicFileInput');
+        const musicVolumeControl = document.getElementById('musicVolume');
+        const volumeValue = document.getElementById('volumeValue');
+        const playMusicBtn = document.getElementById('playMusicBtn');
+        const pauseMusicBtn = document.getElementById('pauseMusicBtn');
+
+        // عناصر التحكم بالتذييل
+        const mainFooter = document.getElementById('mainFooter');
+        const footerTextInput = document.getElementById('footerTextInput');
+        const footerTextColorInput = document.getElementById('footerTextColorInput');
+        const footerBgColorInput = document.getElementById('footerBgColorInput');
+        const updateFooterBtn = document.getElementById('updateFooterBtn');
+
+        let slides = [];
+        let currentSlideIndex = 0;
+        let slideshowInterval;
+        let slideDuration = 5000; // 5 ثواني افتراضية
+
+const allTransitionEffects = [
+    'fade-in',
+    'slide-left',
+    'slide-right',
+    'zoom-in',
+    'rotate-in',
+    'flip-horizontal',
+    'flip-vertical',
+    'bounce-in',
+    'blur-in',
+    'rotate-scale-in'
+];
+
+
+        // وظائف مساعدة لعرض الرسائل
+        function displayMessage(message, isError = false) {
+            messageBox.textContent = message;
+            messageBox.style.backgroundColor = isError ? 'rgba(220, 53, 69, 0.8)' : 'rgba(0, 0, 0, 0.8)';
+            messageBox.classList.add('show');
+            setTimeout(() => {
+                messageBox.classList.remove('show');
+            }, 3000);
+        }
+
+        // وظيفة لإضافة صورة إلى سلايد
+        function addImage(imageUrl, caption = '', title = '') {
+            slides.push({
+                type: 'image',
+                imageUrl: imageUrl,
+                caption: caption,
+                title: title,
+                effect: selectedTransitionEffects[0] // تعيين أول مؤثر افتراضيًا
+            });
+            updateSlidesList();
+            displayMessage('تم إضافة شريحة صورة بنجاح.');
+        }
+
+        // وظيفة لإضافة شريحة طالب
+        function addStudent(name, comment, imageUrl, imageShape) {
+            slides.push({
+                type: 'student',
+                name: name,
+                comment: comment,
+                imageUrl: imageUrl,
+                imageShape: imageShape,
+                effect: selectedTransitionEffects[0] // تعيين أول مؤثر افتراضيًا
+            });
+            updateSlidesList();
+            displayMessage('تم إضافة شريحة طالب بنجاح.');
+        }
+
+        // وظيفة لإضافة شريحة نصية
+        function addTextSlide(title, comment) {
+            slides.push({
+                type: 'text',
+                title: title,
+                comment: comment,
+                effect: selectedTransitionEffects[0] // تعيين أول مؤثر افتراضيًا
+            });
+            updateSlidesList();
+            displayMessage('تم إضافة شريحة نصية بنجاح.');
+        }
+
+        function stopSlideshow() {
+            clearInterval(slideshowInterval);
+        }
+        
+        // وظيفة عرض الشرائح
+// وظيفة عرض الشرائح
+function showSlide(index) {
+    if (slides.length === 0) {
+        slideshowContainer.innerHTML = '<div class="slide active flex flex-col justify-center items-center text-gray-400 text-2xl font-bold">لا توجد شرائح لعرضها. أضف شرائح من لوحة الإعدادات أو حمل الإعدادات الافتراضية.</div>';
+        // إخفاء الأزرار والمؤشرات
+        document.querySelector('.prev')?.remove();
+        document.querySelector('.next')?.remove();
+        document.querySelector('.dots-container')?.remove();
+        return;
+    }
+
+    // إزالة الشرائح السابقة
+    const allSlides = document.querySelectorAll('.slide');
+    allSlides.forEach(slide => {
+        allTransitionEffects.forEach(effect => slide.classList.remove(effect));
+        slide.classList.remove('active');
+        slide.style.opacity = 0;
+        slide.style.transform = 'none';
+    });
+
+    // إعادة بناء الشريحة
+    slideshowContainer.innerHTML = '';
+
+    const slideData = slides[index];
+    const slideElement = document.createElement('div');
+    slideElement.classList.add('slide');
+
+    // خلفية عامة إن وجدت
+    const storedSettings = JSON.parse(localStorage.getItem('slideshowSettings'));
+    if (storedSettings && storedSettings.backgroundImageUrl) {
+        slideElement.style.backgroundImage = `url('${storedSettings.backgroundImageUrl}')`;
+    }
+
+    // بناء محتوى الشريحة
+    if (slideData.type === 'student') {
+        slideElement.classList.add('student-slide');
+        const studentImage = document.createElement('img');
+        studentImage.src = slideData.imageUrl;
+        studentImage.alt = slideData.name;
+        studentImage.classList.add('student-image', slideData.imageShape);
+        slideElement.appendChild(studentImage);
+
+        const studentInfo = document.createElement('div');
+        studentInfo.classList.add('student-info', 'p-4', 'bg-black/50', 'rounded-lg', 'mt-4');
+        const studentName = document.createElement('h2');
+        studentName.classList.add('text-4xl', 'font-bold', 'mb-2');
+        studentName.textContent = slideData.name;
+        const studentComment = document.createElement('p');
+        studentComment.classList.add('text-xl');
+        studentComment.textContent = slideData.comment;
+        studentInfo.appendChild(studentName);
+        studentInfo.appendChild(studentComment);
+        slideElement.appendChild(studentInfo);
+
+    } else if (slideData.type === 'text') {
+        slideElement.classList.add('text-slide');
+        const title = document.createElement('h2');
+        title.textContent = slideData.title;
+        const comment = document.createElement('p');
+        comment.textContent = slideData.comment;
+        slideElement.appendChild(title);
+        slideElement.appendChild(comment);
+
+} else if (slideData.type === 'image') {
+    slideElement.classList.add('image-slide');
+
+    // لو فيه title → نضعه خارج الصورة
+    if (slideData.title) {
+        const titleElement = document.createElement('div');
+        titleElement.classList.add('image-title');
+        titleElement.textContent = slideData.title;
+        slideElement.appendChild(titleElement);
+    }
+
+    // الصورة نفسها داخل إطار
+    const imageElement = document.createElement('img');
+    imageElement.src = slideData.imageUrl;
+    imageElement.alt = slideData.title || 'صورة';
+    slideElement.appendChild(imageElement);
+
+    // لو فيه caption → نضعه على الصورة (أسفل)
+    if (slideData.caption) {
+        const captionElement = document.createElement('div');
+        captionElement.classList.add('image-caption');
+        captionElement.textContent = slideData.caption;
+        slideElement.appendChild(captionElement);
+    }
+}
+
+    slideshowContainer.appendChild(slideElement);
+
+    // ⭐️ جديد — تطبيق المؤثر المناسب
+    let effectToApply = 'fade-in'; // افتراضي
+    if (slideData.effect) {
+        // لو الشريحة لها تأثير معين
+        effectToApply = slideData.effect;
+    } else if (selectedTransitionEffects.length > 0) {
+        // عشوائي من المؤثرات المحددة
+        effectToApply = selectedTransitionEffects[Math.floor(Math.random() * selectedTransitionEffects.length)];
+    }
+
+    // تطبيق المؤثر
+    slideElement.classList.add('active', effectToApply);
+
+    // تحديث الأزرار والنقاط
+    updateNavigationControls();
+}
+
+
+        function testImage(url, callback) {
+    const img = new Image();
+    img.onload = function() { callback(true); };
+    img.onerror = function() { callback(false); };
+    img.src = url;
+}
+
+       // وظيفة للانتقال للشريحة التالية
+        function nextSlide() {
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+            showSlide(currentSlideIndex);
+        }
+
+        // وظيفة للانتقال للشريحة السابقة
+        function prevSlide() {
+            currentSlideIndex = (currentSlideIndex - 1 + slides.length) % slides.length;
+            showSlide(currentSlideIndex);
+        }
+
+        // وظيفة لبدء عرض الشرائح التلقائي
+    function startSlideshow() {
+    clearInterval(slideshowInterval);
+    if (slides.length > 0) {
+        slideDuration = parseInt(slideDurationInput.value) * 1000;
+        slideshowInterval = setInterval(nextSlide, slideDuration);
+        
+        // تشغيل الموسيقى تلقائياً إذا كان هناك مصدر صوت
+        if (backgroundMusicElement.src) {
+            backgroundMusicElement.currentTime = 0; // إعادة التشغيل من البداية
+            backgroundMusicElement.play()
+                .then(() => console.log("الموسيقى تعمل تلقائياً"))
+                .catch(e => {
+                    console.error("خطأ في التشغيل التلقائي:", e);
+                    displayMessage('يتطلب المتصفح تفاعلاً لتشغيل الصوت. الرجاء الضغط على واجهة العرض ', true);
+                });
+        }
+    }
+}
+
+// وظيفة تحديث قائمة الشرائح في لوحة الإعدادات
+function updateSlidesList() {
+    slidesList.innerHTML = '<h3 class="font-semibold text-lg mb-2">الشرائح المضافة:</h3>';
+    
+    if (slides.length === 0) {
+        slidesList.innerHTML += '<p class="text-gray-400 text-sm">لا توجد شرائح مضافة بعد.</p>';
+    }
+
+    slides.forEach((slide, index) => {
+        const slideItem = document.createElement('div');
+        let slideText = '';
+        let thumbnailHtml = '';
+
+        if (slide.type === 'student') {
+            slideText = `طالب: ${slide.name}`;
+            thumbnailHtml = `<img src="${slide.imageUrl}" alt="صورة الطالب" class="slide-thumbnail ${slide.imageShape}">`;
+        } else if (slide.type === 'text') {
+            slideText = `نص: ${slide.title || 'شريحة نصية'}`;
+            thumbnailHtml = `<span class="slide-thumbnail flex items-center justify-center bg-blue-700 text-white text-xs">نص</span>`;
+        } else if (slide.type === 'image') {
+            slideText = `صورة: ${slide.caption || 'صورة عامة'}`;
+            thumbnailHtml = `<img src="${slide.imageUrl}" alt="صورة" class="slide-thumbnail">`;
+        }
+
+        // ⭐️ جديد — إضافة اسم التأثير
+        let effectName = slide.effect ? slide.effect : 'عشوائي';
+        slideText += ` (تأثير: ${effectName})`;
+
+        slideItem.innerHTML = `
+            <div class="slide-item-content">
+                ${thumbnailHtml}
+                <span>${index + 1}. ${slideText}</span>
+            </div>
+            <div class="slide-controls flex flex-col gap-1">
+                <!-- القائمة المنسدلة لتحديد المؤثر -->
+                <select class="effect-selector text-sm px-1 py-1 rounded bg-gray-700 text-white" data-index="${index}" title="تأثير الانتقال">
+                    <option value="">عشوائي</option>
+                    ${allTransitionEffects.map(effect => `
+                        <option value="${effect}" ${slide.effect === effect ? 'selected' : ''}>${effect}</option>
+                    `).join('')}
+                </select>
+
+                <!-- أزرار التحكم -->
+                <div class="flex gap-1 mt-1">
+                    <button class="move-btn bg-blue-500 hover:bg-blue-600" data-index="${index}" data-direction="up" title="نقل للأعلى">⬆️</button>
+                    <button class="move-btn bg-blue-500 hover:bg-blue-600" data-index="${index}" data-direction="down" title="نقل للأسفل">⬇️</button>
+                    <button class="bg-red-600 hover:bg-red-700" data-index="${index}" title="حذف الشريحة">🗑️</button>
+                </div>
+            </div>
+        `;
+
+        slidesList.appendChild(slideItem);
+    });
+
+    // مستمع الأزرار (حذف - نقل)
+    slidesList.querySelectorAll('button').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            
+            if (e.target.textContent.includes('🗑️')) { // حذف
+                slides.splice(index, 1);
+                if (currentSlideIndex >= slides.length && slides.length > 0) {
+                    currentSlideIndex = slides.length - 1;
+                } else if (slides.length === 0) {
+                    currentSlideIndex = 0;
+                }
+                displayMessage('تم حذف الشريحة.');
+            } else if (e.target.dataset.direction === 'up') { // للأعلى
+                if (index > 0) {
+                    [slides[index], slides[index - 1]] = [slides[index - 1], slides[index]];
+                    if (currentSlideIndex === index) currentSlideIndex--;
+                    else if (currentSlideIndex === index - 1) currentSlideIndex++;
+                    displayMessage('تم نقل الشريحة للأعلى.');
+                } else {
+                    displayMessage('هذه الشريحة بالفعل في الأعلى.', true);
+                }
+            } else if (e.target.dataset.direction === 'down') { // للأسفل
+                if (index < slides.length - 1) {
+                    [slides[index], slides[index + 1]] = [slides[index + 1], slides[index]];
+                    if (currentSlideIndex === index) currentSlideIndex++;
+                    else if (currentSlideIndex === index + 1) currentSlideIndex--;
+                    displayMessage('تم نقل الشريحة للأسفل.');
+                } else {
+                    displayMessage('هذه الشريحة بالفعل في الأسفل.', true);
+                }
+            }
+
+            updateSlidesList();
+            showSlide(currentSlideIndex);
+        });
+    });
+
+    // ⭐️ جديد — مستمع للقائمة المنسدلة (select)
+    slidesList.querySelectorAll('.effect-selector').forEach(selector => {
+        selector.addEventListener('change', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            const selectedEffect = e.target.value || null;
+            slides[index].effect = selectedEffect;
+            displayMessage(`تم تحديث تأثير الشريحة رقم ${index + 1} إلى: ${selectedEffect || 'عشوائي'}.`);
+            showSlide(currentSlideIndex); // عرض مباشر للتأثير
+        });
+    });
+
+    // تحديث العرض والمؤقت
+    showSlide(currentSlideIndex);
+    startSlideshow();
+}
+
+function updateNavigationControls() {
+    // ⭐ تحديث المؤشرات (النقاط)
+    let dotsContainer = document.querySelector('.dots-container');
+    if (!dotsContainer) {
+        dotsContainer = document.createElement('div');
+        dotsContainer.classList.add('dots-container');
+        slideshowContainer.appendChild(dotsContainer);
+    }
+    dotsContainer.innerHTML = ''; // مسح النقاط القديمة
+
+    if (slides.length > 0) {
+        for (let i = 0; i < slides.length; i++) {
+            const dot = document.createElement('span');
+            dot.classList.add('dot');
+            if (i === currentSlideIndex) {
+                dot.classList.add('active');
+            }
+            dot.addEventListener('click', () => {
+                currentSlideIndex = i;
+                showSlide(currentSlideIndex);
+                // لا نعيد startSlideshow هنا حتى لا نعيد المؤقت كل مرة
+            });
+            dotsContainer.appendChild(dot);
+        }
+        dotsContainer.style.display = 'block';
+    } else {
+        dotsContainer.style.display = 'none';
+    }
+
+    // ⭐ أزرار التنقل
+    let prevBtn = document.querySelector('.prev');
+    let nextBtn = document.querySelector('.next');
+
+    if (slides.length > 1) {
+        if (!prevBtn) {
+            prevBtn = document.createElement('a');
+            prevBtn.classList.add('prev');
+            prevBtn.innerHTML = '&#10094;';
+            prevBtn.addEventListener('click', () => {
+                prevSlide();
+                // لا نعيد startSlideshow هنا — يبقى المؤقت كما هو
+            });
+            slideshowContainer.appendChild(prevBtn);
+        }
+        if (!nextBtn) {
+            nextBtn = document.createElement('a');
+            nextBtn.classList.add('next');
+            nextBtn.innerHTML = '&#10095;';
+            nextBtn.addEventListener('click', () => {
+                nextSlide();
+                // لا نعيد startSlideshow هنا — يبقى المؤقت كما هو
+            });
+            slideshowContainer.appendChild(nextBtn);
+        }
+        prevBtn.style.display = 'block';
+        nextBtn.style.display = 'block';
+    } else {
+        if (prevBtn) prevBtn.style.display = 'none';
+        if (nextBtn) nextBtn.style.display = 'none';
+    }
+}
+
+        // دالة لتصدير الإعدادات (الشرائح) إلى ملف JSON
+// دالة لحفظ الإعدادات الحالية إلى ملف JSON يمكن تنزيله
+            function saveSettingsToFile() {
+    const settingsToSave = {
+        slides: slides,
+        background: {
+            url: backgroundImageUrlInput.value,
+        },
+        music: {
+            url: backgroundMusicUrlInput.value,
+            volume: musicVolumeControl.value
+        },
+        footer: {
+            text: footerTextInput.value,
+            textColor: footerTextColorInput.value,
+            bgColor: footerBgColorInput.value
+        },
+        currentSlideIndex: currentSlideIndex,
+        slideDuration: slideDurationInput.value,
+        transitionEffects: selectedTransitionEffects,
+    };
+
+    const dataStr = JSON.stringify(settingsToSave, null, 4);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'عرض_النجاح_الإعدادات.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    displayMessage('تم حفظ إعدادات العرض كملف JSON.');
+}
+
+// وظيفة لتحميل الإعدادات الافتراضية
+function loadDefaultSettings() {
+    slides = []; // مسح الشرائح الحالية
+
+    // إضافة خلفية افتراضية (ملف محلي)
+    const defaultBackgroundFile = 'background.jpg'; // اسم ملف الخلفية في نفس المجلد
+    backgroundImageUrlInput.value = defaultBackgroundFile;
+    updateBackground();
+
+    // إضافة ملف صوتي افتراضي (ملف محلي)
+    const defaultMusicFile = 'graduation.mp3'; // اسم الملف الصوتي في نفس المجلد
+    backgroundMusicUrlInput.value = defaultMusicFile;
+    backgroundMusicElement.src = defaultMusicFile;
+    musicVolumeControl.value = 0.5;
+    volumeValue.textContent = '50%';
+
+    // إعدادات التذييل الافتراضية
+    footerTextInput.value = 'حفل تخرجنا 2024';
+    footerTextColorInput.value = '#FFFFFF';
+    footerBgColorInput.value = '#000000';
+    updateFooter();
+
+    selectedTransitionEffects = ['fade-in', 'slide-left']; // تأثيرات افتراضية للخلط
+
+    // هذه الإضافة بعد تحميل المصادر
+    backgroundMusicElement.volume = musicVolumeControl.value;
+    startSlideshow(); // سيحاول تشغيل الموسيقى تلقائياً
+
+    // إضافة طلاب افتراضيين (بصور Placeholder وأشكال مختلفة)
+    addStudent("اسم الطالب", "العبارة التحفيزية | صورة احتواء", "student1.jpg", "circle");
+    addStudent("اسم الطالب", "عبارة تحفيزية | صورة مستطيلة 4*6", "student2.jpg", "rectangle");
+
+    addTextSlide("تهانينا!", "نتمنى لكم دوام التوفيق والنجاح. هذه شريحة نصية");
+    addTextSlide("ألف مبروك التخرج!", "نفخر بإنجازاتكم ونتمنى لكم كل التوفيق في مسيرتكم القادمة.");
+
+    addImage('photo1.jpg', 'تعلم وإلى العلياء تقدم', 'العلم نور | صورة كاملة');
+    addImage('photo2.jpg', 'تعلم وإلى العلياء تقدم', 'العلم نور | صورة كاملة');
+
+    slideDurationInput.value = 5; // إعادة ضبط المدة الافتراضية
+    updateSlidesList();
+    displayMessage('تم تحميل الإعدادات الافتراضية بنجاح.');
+    startSlideshow(); // بدء العرض
+}
+
+
+        // دالة لمحاولة تشغيل الصوت عند أي تفاعل مع الصفحة
+function enableAudio() {
+    document.body.addEventListener('click', function() {
+        if (backgroundMusicElement.paused && backgroundMusicElement.src) {
+            backgroundMusicElement.play()
+                .then(() => console.log("تم تشغيل الصوت بعد التفاعل"))
+                .catch(e => console.error("فشل تشغيل الصوت:", e));
+        }
+    }, { once: true }); // تعمل مرة واحدة فقط
+}
+
+        // وظيفة لمسح جميع الشرائح والإعدادات
+        function clearAllSlides() {
+            slides = [];
+            currentSlideIndex = 0;
+            slideshowContainer.innerHTML = '<div class="slide active flex flex-col justify-center items-center text-gray-400 text-2xl font-bold">لا توجد شرائح لعرضها. أضف شرائح من لوحة الإعدادات، حمل الإعدادات الافتراضية، أو حمل عرضًا من ملف JSON.</div>';
+            //localStorage.removeItem('slideshowSettings');//
+            updateSlidesList();
+            stopSlideshow();
+            updateTransitionCheckboxes();;
+            showSlide(currentSlideIndex); // عرض رسالة "لا توجد شرائح"
+            backgroundImageUrlInput.value = '';
+            document.body.style.backgroundImage = 'none';
+            backgroundPreview.style.display = 'none';
+            musicVolumeControl.value = 0.5;
+            volumeValue.textContent = '50%';
+            slideDurationInput.value = 5;
+            footerTextInput.value = '';
+            footerTextColorInput.value = '#FFFFFF';
+            footerBgColorInput.value = '#000000';
+            slideshowContainer.style.backgroundImage = 'none';
+            slideshowContainer.style.backgroundSize = '';
+            slideshowContainer.style.backgroundPosition = '';
+            slideshowContainer.style.backgroundRepeat = '';
+            loadDefaultSettings();
+            updateFooter();
+            selectedTransitionEffects = ['fade-in']; // إعادة تعيين التأثيرات
+
+            displayMessage('تم مسح جميع الشرائح والإعدادات.');
+        }
+
+        // معالجة رفع الملفات للصور والموسيقى
+        function handleFileUpload(fileInput, urlInput, previewElement = null) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        urlInput.value = event.target.result; // تعيين رابط الصورة كـ base64
+                        if (previewElement) {
+                            previewElement.src = event.target.result;
+                            previewElement.style.display = 'block';
+                        }
+                        if (fileInput.id === 'backgroundMusicFileInput') {
+                            backgroundMusicElement.src = event.target.result;
+                            backgroundMusicElement.play().catch(e => console.error("فشل تشغيل الموسيقى بعد الرفع:", e));
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    urlInput.value = '';
+                    if (previewElement) {
+                        previewElement.style.display = 'none';
+                    }
+                    if (fileInput.id === 'backgroundMusicFileInput') {
+                        backgroundMusicElement.pause();
+                        backgroundMusicElement.src = '';
+                    }
+                }
+            });
+
+            // تحديث المعاينة عند تغيير الرابط يدوياً (للتأكد من أنها لا تزال تعمل بشكل صحيح)
+            urlInput.addEventListener('input', () => {
+                if (urlInput.value) {
+                    if (previewElement) {
+                        previewElement.src = urlInput.value;
+                        previewElement.style.display = 'block';
+                    }
+                    if (urlInput.id === 'backgroundMusicUrl') {
+                        backgroundMusicElement.src = urlInput.value;
+                        backgroundMusicElement.play().catch(e => console.error("فشل تشغيل الموسيقى بعد تغيير الرابط:", e));
+                    }
+                } else {
+                    if (previewElement) {
+                        previewElement.style.display = 'none';
+                    }
+                    if (urlInput.id === 'backgroundMusicUrl') {
+                        backgroundMusicElement.pause();
+                        backgroundMusicElement.src = '';
+                    }
+                }
+            });
+        }
+
+function updateBackground() {
+    backgroundImageUrl="background.jpg"
+    const imageUrl = backgroundImageUrlInput.value.trim();
+    const file = backgroundFileInput.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            slideshowContainer.style.backgroundImage = `url('${e.target.result}')`;
+            slideshowContainer.style.backgroundSize = 'cover';
+            slideshowContainer.style.backgroundPosition = 'center';
+            slideshowContainer.style.backgroundRepeat = 'no-repeat';
+            backgroundPreview.src = e.target.result;
+            backgroundPreview.style.display = 'block';
+            displayMessage('تم تحديث خلفية العرض من ملف.');
+        };
+        reader.readAsDataURL(file);
+    } else if (imageUrl) {
+        slideshowContainer.style.backgroundImage = `url('${imageUrl}')`;
+        slideshowContainer.style.backgroundSize = 'cover';
+        slideshowContainer.style.backgroundPosition = 'center';
+        slideshowContainer.style.backgroundRepeat = 'no-repeat';
+        backgroundPreview.src = imageUrl;
+        backgroundPreview.style.display = 'block';
+        displayMessage('تم تحديث خلفية العرض من رابط.');
+    } else {
+        slideshowContainer.style.backgroundImage = 'none';
+        slideshowContainer.style.backgroundSize = '';
+        slideshowContainer.style.backgroundPosition = '';
+        slideshowContainer.style.backgroundRepeat = '';
+        backgroundPreview.style.display = 'none';
+        backgroundPreview.src = '';
+        displayMessage('تم إزالة خلفية العرض.');
+    }
+}
+
+        // دالة لتحميل الإعدادات من ملف يختاره المستخدم
+function loadSettingsFromFile(event) {
+    const file = event.target.files[0];
+    if (!file) {
+        displayMessage('الرجاء تحديد ملف JSON للتحميل.', true);
+        return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        try {
+            const importedSettings = JSON.parse(e.target.result);
+
+if (importedSettings && Array.isArray(importedSettings.slides)) {
+    slides = [];
+    importedSettings.slides.forEach(s => {
+        // لو الشرائح القديمة ما فيها "effect" → ضع "fade-in" كافتراضي
+        if (!s.effect || !allTransitionEffects.includes(s.effect)) {
+            s.effect = 'fade-in';
+        }
+        slides.push(s);
+    });
+
+
+                currentSlideIndex = importedSettings.currentSlideIndex || 0;
+
+                // استعادة الخلفية
+                if (importedSettings.background && importedSettings.background.url) {
+                    backgroundImageUrlInput.value = importedSettings.background.url;
+                    updateBackground();
+                }
+
+                // استعادة إعدادات الموسيقى
+                if (importedSettings.music) {
+                    backgroundMusicUrlInput.value = importedSettings.music.url || '';
+                    musicVolumeControl.value = importedSettings.music.volume || 0.5;
+                    volumeValue.textContent = `${Math.round((importedSettings.music.volume || 0.5) * 100)}%`;
+                    if (importedSettings.music.url) {
+                        backgroundMusicElement.src = importedSettings.music.url;
+                    }
+                }
+
+                // استعادة إعدادات التذييل
+                if (importedSettings.footer) {
+                    footerTextInput.value = importedSettings.footer.text || '';
+                    footerTextColorInput.value = importedSettings.footer.textColor || '#FFFFFF';
+                    footerBgColorInput.value = importedSettings.footer.bgColor || '#000000';
+                    updateFooter();
+                }
+
+                if (importedSettings.slideDuration) {
+                    slideDurationInput.value = importedSettings.slideDuration;
+                }
+
+                if (importedSettings.transitionEffects && Array.isArray(importedSettings.transitionEffects)) {
+                    selectedTransitionEffects = importedSettings.transitionEffects;
+                }
+
+                updateSlidesList();
+                showSlide(currentSlideIndex);
+                startSlideshow();
+
+                displayMessage('تم تحميل الإعدادات من الملف بنجاح!');
+            } else {
+                displayMessage('ملف JSON الذي تم تحميله غير صالح أو لا يحتوي على بيانات الشرائح.', true);
+            }
+        } catch (error) {
+            console.error('خطأ في تحليل ملف JSON:', error);
+            displayMessage('حدث خطأ أثناء تحميل الملف. تأكد من أنه ملف JSON صالح.', true);
+        }
+    };
+
+    reader.onerror = () => {
+        displayMessage('حدث خطأ أثناء قراءة الملف.', true);
+    };
+
+    reader.readAsText(file);
+}
+
+        // دالة لحفظ الإعدادات الحالية إلى ملف JSON يمكن تنزيله
+            function exportCurrentSettings() {
+                const settingsToSave = {
+                    slides: slides,
+                    background: {
+                        url: backgroundImageUrlInput.value,
+                    },
+     
+                    music: {
+                    url: backgroundMusicUrlInput.value,
+                    volume: musicVolumeControl.value
+                   },
+
+                   footer: {
+                   text: footerTextInput.value,
+                   textColor: footerTextColorInput.value,
+                   bgColor: footerBgColorInput.value
+                  },
+                   currentSlideIndex: currentSlideIndex,
+                    slideDuration: slideDurationInput.value,
+                    transitionEffects: selectedTransitionEffects,
+                };
+
+                const dataStr = JSON.stringify(settingsToSave, null, 4);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'عرض_النجاح_الإعدادات.json'; // اسم الملف الافتراضي
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                displayMessage('تم حفظ إعدادات العرض كملف JSON.');
+            }
+
+        // وظيفة لتحديث التذييل
+        function updateFooter() {
+            mainFooter.textContent = footerTextInput.value;
+            mainFooter.style.color = footerTextColorInput.value;
+            mainFooter.style.backgroundColor = footerBgColorInput.value;
+            if (footerTextInput.value.trim() === '') {
+                mainFooter.style.display = 'none';
+            } else {
+                mainFooter.style.display = 'block';
+            }
+        }
+
+        // وظيفة للحصول على التأثيرات المختارة من مربعات الاختيار
+        function getSelectedTransitionEffects() {
+            const checkboxes = transitionEffectsContainer.querySelectorAll('input[type="checkbox"]:checked');
+            return Array.from(checkboxes).map(cb => cb.value);
+        }
+
+
+        // دالة لتحويل الصور إلى base64
+async function imageToBase64(url) {
+    try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+        });
+    } catch (error) {
+        console.error('Error converting image:', error);
+        return url; // إذا فشل التحويل نعود للرابط الأصلي
+    }
+}
+
+// دالة لتحويل الصوت إلى base64
+async function audioToBase64(url) {
+    try {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result);
+            reader.readAsDataURL(blob);
+        });
+    } catch (error) {
+        console.error('Error converting audio:', error);
+        return url;
+    }
+}
+
+// ⭐️ دالة توليد النسخة النهائية
+async function generateFinalVersion() {
+    try {
+        displayMessage('جاري إنشاء النسخة النهائية...');
+
+        // 🟢 تحضير كائن الإعدادات (config)
+        const config = {
+            slides: [],
+            background: {
+                url: backgroundImageUrlInput.value || currentBackgroundUrl,
+                isLocal: backgroundFileInput.files.length > 0
+            },
+            music: {
+                url: backgroundMusicUrlInput.value || currentMusicUrl,
+                isLocal: backgroundMusicFileInput.files.length > 0,
+                volume: musicVolumeControl.value
+            },
+            footer: {
+                text: footerTextInput.value,
+                textColor: footerTextColorInput.value,
+                bgColor: footerBgColorInput.value
+            },
+            settings: {
+                duration: slideDurationInput.value,
+                transitions: selectedTransitionEffects
+            }
+        };
+
+        // 🔸 تحويل الشرائح إلى base64 (إن لزم) + إضافة المؤثر
+        for (const slide of slides) {
+            const newSlide = { ...slide };
+
+            // ⭐️ دعم الصور لجميع أنواع الشرائح
+            if (slide.imageUrl) {
+                if (slide.imageUrl.startsWith('http') || slide.imageUrl.startsWith('data:')) {
+                    newSlide.imageUrl = await imageToBase64(slide.imageUrl);
+                } else {
+                    newSlide.imageUrl = slide.imageUrl; // مسار محلي
+                }
+            }
+
+            // ⭐️ دعم المؤثر المحدد (أو عشوائي لو فارغ)
+            newSlide.effect = slide.effect ? slide.effect : null;
+
+            // ✅ أضف الشريحة الجديدة إلى config
+            config.slides.push(newSlide);
+        }
+
+        // 🔸 تحويل خلفية إلى base64 إذا كانت محلية
+        if (config.background.url && config.background.isLocal) {
+            config.background.url = await imageToBase64(config.background.url);
+        }
+
+        // 🔸 تحويل الموسيقى إلى base64 إذا كانت محلية
+        if (config.music.url && config.music.isLocal) {
+            config.music.url = await audioToBase64(config.music.url);
+        }
+
+        // ⭐️ توليد HTML النسخة النهائية
+        const htmlContent = generateFinalHTML(config);
+
+        // 📥 تنزيل الملف HTML
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'عرض_التخرج_النهائي.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        displayMessage('تم توليد النسخة النهائية بنجاح!');
+    } catch (error) {
+        console.error('Error generating final version:', error);
+        displayMessage('حدث خطأ أثناء توليد النسخة النهائية', true);
+    }
+}
+
+function generateFinalHTML(config) {
+    return `
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>عرض التخرج - نسخة نهائية</title>
+    <script src="https://cdn.tailwindcss.com"><\/script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet" />
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            background-color: #000;
+        }
+
+        .slideshow-container {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            background-image: url('${config.background.url}');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            transition: all 1s ease-in-out;
+        }
+
+        .slide.show {
+            opacity: 1;
+            z-index: 1;
+        }
+
+        .slide.text-slide {
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            text-align: center;
+        }
+
+        .slide.text-slide h2 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        .slide.text-slide p {
+            font-size: 1.5em;
+        }
+
+        .slide.student-slide {
+            flex-direction: column;
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .slide.student-slide img {
+            display: block;
+            margin: 0 auto 20px auto;
+            border: 5px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .student-image.circle {
+            border-radius: 50%;
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .student-image.rectangle {
+            width: 250px;
+            height: 375px;
+            object-fit: cover;
+        }
+
+        /* ✅ تعديل image-slide الجديد */
+        .slide.image-slide {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+        }
+        .slide.image-slide img {
+    max-width: 60%; /* ✅ عرض أقصى 60% */
+    max-height: 60vh; /* ✅ ارتفاع أقصى 60% من الشاشة */
+    height: auto;
+    border: 5px solid white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    margin-bottom: 10px;
+}
+
+        .slide.image-slide .image-title {
+            font-size: 2em;
+            color: white;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .slide.image-slide img {
+            max-width: 70%;
+            height: auto;
+            border: 5px solid white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            margin-bottom: 10px;
+        }
+
+        .slide.image-slide .image-caption {
+            position: absolute;
+            bottom: 50px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-size: 1.2em;
+            color: white;
+        }
+
+        /* المؤثرات */
+        .fade-in { opacity: 0; transition: opacity 1s ease-in-out; }
+        .fade-in.show { opacity: 1; }
+
+        .slide-left { transform: translateX(100%); transition: transform 1s ease-in-out, opacity 1s ease-in-out; opacity: 0; }
+        .slide-left.show { transform: translateX(0); opacity: 1; }
+
+        .slide-right { transform: translateX(-100%); transition: transform 1s ease-in-out, opacity 1s ease-in-out; opacity: 0; }
+        .slide-right.show { transform: translateX(0); opacity: 1; }
+
+        .zoom-in { transform: scale(0.5); transition: transform 1s ease-in-out, opacity 1s ease-in-out; opacity: 0; }
+        .zoom-in.show { transform: scale(1); opacity: 1; }
+
+        .rotate-in { transform: rotateY(90deg); transition: transform 1s ease-in-out, opacity 1s ease-in-out; opacity: 0; }
+        .rotate-in.show { transform: rotateY(0); opacity: 1; }
+
+        .start-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.95);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            color: white;
+            text-align: center;
+        }
+
+        .start-content h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            color: gold;
+        }
+
+        .start-content button {
+            background-color: #38a169;
+            color: white;
+            font-size: 1.2em;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .start-content button:hover {
+            background-color: #2f855a;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            padding: 12px;
+            text-align: center;
+            font-size: 1em;
+            z-index: 10;
+            color: ${config.footer.textColor || '#fff'};
+            background-color: ${config.footer.bgColor || '#333'};
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .prev, .next {
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 16px;
+            margin-top: -22px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 20;
+        }
+
+        .next {
+            right: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .prev {
+            left: 0;
+            border-radius: 0 3px 3px 0;
+        }
+
+        .prev:hover, .next:hover {
+            background-color: rgba(0, 0, 0, 0.8);
+        }
+    </style>
+</head>
+<body>
+    <div class="start-overlay" id="startOverlay">
+        <div class="start-content">
+            <h1>✨ بسم الله نبدأ عرضنا ✨</h1>
+            <button id="startBtn">اضغط هنا للبدء</button>
+        </div>
+    </div>
+
+    <div class="slideshow-container" id="slideshowContainer"></div>
+    <div class="footer" id="mainFooter">${config.footer.text || ''}</div>
+    <audio id="backgroundMusic" loop></audio>
+    <a class="prev" id="prevBtn">&#10094;</a>
+    <a class="next" id="nextBtn">&#10095;</a>
+
+    <script>
+        const config = ${JSON.stringify(config, null, 4)};
+        let currentSlideIndex = 0;
+        let slideshowInterval;
+        const container = document.getElementById('slideshowContainer');
+        const footer = document.getElementById('mainFooter');
+        const music = document.getElementById('backgroundMusic');
+
+        function showSlide(index) {
+            container.innerHTML = '';
+            if (!config.slides.length) {
+                container.innerHTML = '<div style="color:white;text-align:center;padding-top:40vh;font-size:24px;">لا توجد شرائح</div>';
+                return;
+            }
+
+            const slide = config.slides[index];
+            const slideEl = document.createElement('div');
+
+            let effectToApply = 'fade-in';
+            if (slide.effect && config.settings.transitions.includes(slide.effect)) {
+                effectToApply = slide.effect;
+            } else if (config.settings.transitions.length > 0) {
+                effectToApply = config.settings.transitions[Math.floor(Math.random() * config.settings.transitions.length)];
+            }
+
+            slideEl.classList.add('slide', effectToApply, 'show');
+
+            if (slide.type === 'student') {
+                slideEl.classList.add('student-slide');
+                let imgClass = (slide.imageShape === 'circle') ? 'student-image circle' : 'student-image rectangle';
+                slideEl.innerHTML = \`
+                    <img src="\${slide.imageUrl}" alt="\${slide.name}" class="\${imgClass}">
+                    <h2 style="margin-top:20px;font-size:2em;">\${slide.name}</h2>
+                    <p style="margin-top:10px;max-width:80%;text-align:center;">\${slide.comment}</p>
+                \`;
+            }
+            else if (slide.type === 'text') {
+                slideEl.classList.add('text-slide');
+                slideEl.innerHTML = \`
+                    <h2>\${slide.title}</h2>
+                    <p>\${slide.comment}</p>
+                \`;
+            }
+            else if (slide.type === 'image') {
+                slideEl.classList.add('image-slide');
+                slideEl.innerHTML = \`
+                    \${slide.title ? \`<div class="image-title">\${slide.title}</div>\` : ''}
+                    <img src="\${slide.imageUrl}" alt="\${slide.title || 'صورة'}">
+                    \${slide.caption ? \`<div class="image-caption">\${slide.caption}</div>\` : ''}
+                \`;
+            }
+
+            container.appendChild(slideEl);
+        }
+
+        function startSlideshow() {
+            clearInterval(slideshowInterval);
+            if (config.slides.length > 0) {
+                if (config.music.url) {
+                    music.src = config.music.url;
+                    music.volume = config.music.volume || 0.5;
+                    music.play().catch(() => console.log('اضغط على الصفحة لتشغيل الصوت.'));
+                }
+
+                slideshowInterval = setInterval(() => {
+                    currentSlideIndex = (currentSlideIndex + 1) % config.slides.length;
+                    showSlide(currentSlideIndex);
+                }, (config.settings.duration || 5) * 1000);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            footer.textContent = config.footer.text || '';
+            footer.style.color = config.footer.textColor || '#fff';
+            footer.style.backgroundColor = config.footer.bgColor || '#333';
+            showSlide(0);
+
+            document.getElementById('startBtn').addEventListener('click', () => {
+                document.getElementById('startOverlay').style.display = 'none';
+                startSlideshow();
+
+                if (music.paused && music.src) music.play();
+            });
+
+            document.getElementById('prevBtn').addEventListener('click', () => {
+                currentSlideIndex = (currentSlideIndex - 1 + config.slides.length) % config.slides.length;
+                showSlide(currentSlideIndex);
+                resetSlideshowInterval();
+            });
+
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                currentSlideIndex = (currentSlideIndex + 1) % config.slides.length;
+                showSlide(currentSlideIndex);
+                resetSlideshowInterval();
+            });
+        });
+
+        function resetSlideshowInterval() {
+            clearInterval(slideshowInterval);
+            slideshowInterval = setInterval(() => {
+                currentSlideIndex = (currentSlideIndex + 1) % config.slides.length;
+                showSlide(currentSlideIndex);
+            }, (config.settings.duration || 5) * 1000);
+        }
+    <\/script>
+</body>
+</html>
+    `;
+}
+
+// أضف هذا مع مستمعي الأحداث الأخرى
+// ✅ ربط معالجات رفع الملفات
+handleFileUpload(backgroundFileInput, backgroundImageUrlInput, backgroundPreview);
+handleFileUpload(studentFileInput, studentImageUrlInput, studentPreview);
+handleFileUpload(imageFileInput, imageUrlInput, imagePreview);
+handleFileUpload(backgroundMusicFileInput, backgroundMusicUrlInput);
+
+
+document.addEventListener('DOMContentLoaded', () => {
+
+    // ✅ تهيئة الشرائح
+    slides = [];
+    currentSlideIndex = 0;
+
+    // ✅ رسالة البداية
+    slideshowContainer.innerHTML = '<div class="slide active flex flex-col justify-center items-center text-gray-400 text-2xl font-bold">لا توجد شرائح لعرضها. أضف شرائح من لوحة الإعدادات، حمل الإعدادات الافتراضية، أو حمل عرضًا من ملف JSON.</div>';
+
+    updateSlidesList();
+    stopSlideshow();
+
+    // ✅ تهيئة الخلفية
+    backgroundImageUrlInput.value = '';
+    document.body.style.setProperty('background-image', 'none', 'important');
+    document.body.style.backgroundSize = '';
+    document.body.style.backgroundPosition = '';
+    document.body.style.backgroundRepeat = '';
+    backgroundPreview.style.display = 'none';
+    backgroundPreview.src = '';
+
+    // ✅ تهيئة المدة
+    slideDurationInput.value = 5;
+
+    // ✅ تفعيل الصوت
+    enableAudio();
+
+    // ✅ تحميل الإعدادات الافتراضية
+    loadDefaultSettings();
+
+    // ✅ ربط الأزرار والأحداث:
+
+    startSlideshowBtn.addEventListener('click', () => {
+        if (slides.length > 0) {
+            currentSlideIndex = 0;
+            showSlide(currentSlideIndex);
+            startSlideshow();
+
+            if (backgroundMusicElement.src) {
+                backgroundMusicElement.currentTime = 0;
+                backgroundMusicElement.play().catch(e => {
+                    displayMessage('فشل تشغيل الموسيقى تلقائيًا. الرجاء التشغيل يدوياً.', true);
+                    console.error("خطأ في تشغيل الموسيقى:", e);
+                });
+            }
+
+            displayMessage('تم بدء العرض والموسيقى.');
+        } else {
+            displayMessage('لا توجد شرائح لبدء العرض. الرجاء إضافة شرائح أولاً.', true);
+        }
+    });
+
+    stopSlideshowBtn.addEventListener('click', () => {
+        clearInterval(slideshowInterval);
+        backgroundMusicElement.pause();
+        displayMessage('تم إيقاف العرض والموسيقى.');
+    });
+
+    settingsToggleBtn.addEventListener('click', () => {
+        settingsPanel.classList.toggle('open');
+    });
+
+    document.getElementById('generateFinalBtn').addEventListener('click', generateFinalVersion);
+
+    addStudentBtn.addEventListener('click', () => {
+        const name = studentNameInput.value.trim();
+        const comment = studentCommentInput.value.trim();
+        const imageUrl = studentImageUrlInput.value.trim();
+        const imageShape = studentImageShapeInput.value;
+        if (name && imageUrl) {
+            addStudent(name, comment, imageUrl, imageShape);
+            studentNameInput.value = '';
+            studentCommentInput.value = '';
+            studentImageUrlInput.value = '';
+            studentFileInput.value = '';
+            studentPreview.style.display = 'none';
+        } else {
+            displayMessage('الرجاء إدخال اسم الطالب ورابط الصورة.', true);
+        }
+    });
+
+    addTextSlideBtn.addEventListener('click', () => {
+        const title = textTitleInput.value.trim();
+        const comment = textCommentInput.value.trim();
+        if (title || comment) {
+            addTextSlide(title, comment);
+            textTitleInput.value = '';
+            textCommentInput.value = '';
+        } else {
+            displayMessage('الرجاء إدخال عنوان أو نص للشريحة.', true);
+        }
+    });
+
+    addImageBtn.addEventListener('click', () => {
+        const url = imageUrlInput.value.trim();
+        const caption = imageCaptionInput.value.trim();
+        const imgTitle = imageTitleInput.value.trim();
+        if (url) {
+            addImage(url, caption, imgTitle);
+            imageUrlInput.value = '';
+            imageCaptionInput.value = '';
+            imageTitleInput.value = '';
+            imageFileInput.value = '';
+            imagePreview.style.display = 'none';
+        } else {
+            displayMessage('الرجاء إدخال رابط الصورة.', true);
+        }
+    });
+
+    pauseMusicBtn.addEventListener('click', () => {
+        backgroundMusicElement.pause();
+    });
+
+    playMusicBtn.addEventListener('click', () => {
+        if (backgroundMusicElement.src) {
+            backgroundMusicElement.play().catch(e => {
+                displayMessage('فشل تشغيل الموسيقى. قد يكون المتصفح يمنع التشغيل التلقائي.', true);
+                console.error("خطأ في تشغيل الموسيقى:", e);
+            });
+        } else {
+            displayMessage('لا يوجد رابط لمادة صوتية. الرجاء إضافة رابط أو رفع ملف.', true);
+        }
+    });
+
+    musicVolumeControl.addEventListener('input', () => {
+        backgroundMusicElement.volume = musicVolumeControl.value;
+        volumeValue.textContent = `${Math.round(backgroundMusicElement.volume * 100)}%`;
+    });
+
+    updateFooterBtn.addEventListener('click', () => {
+        updateFooter();
+        displayMessage('تم تحديث التذييل.');
+    });
+
+    loadDefaultsBtn.addEventListener('click', loadDefaultSettings);
+    clearAllBtn.addEventListener('click', clearAllSlides);
+    exportSettingsBtn.addEventListener('click', exportCurrentSettings);
+    loadFromFileBtn.addEventListener('click', () => loadFileInput.click());
+    loadFileInput.addEventListener('change', loadSettingsFromFile);
+    slideDurationInput.addEventListener('change', startSlideshow);
+    updateBackgroundBtn.addEventListener('click', updateBackground);
+
+});
+
+    </script>
+</body>
+</html>
