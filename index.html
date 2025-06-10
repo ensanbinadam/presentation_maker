@@ -636,6 +636,8 @@
             <input type="color" id="footerBgColorInput" value="#000000">
             <button id="updateFooterBtn" class="bg-teal-600 hover:bg-teal-700">تحديث التذييل</button>
         </div>
+        <!-- حقل تحرير الشريحة -->
+<input type="hidden" id="editIndex" value="">
 
         <!-- التحكم بالشرائح -->
         <div class="mb-4 p-3 border rounded-lg">
@@ -690,7 +692,6 @@
         const settingsPanel = document.getElementById('settingsPanel');
         const startSlideshowBtn = document.getElementById('startSlideshowBtn');
         const stopSlideshowBtn = document.getElementById('stopSlideshowBtn');
-        const SETTINGS_FILE_PATH = 'settings.json'; // المسار الافتراضي لملف الإعدادات
 
         // عناصر التحكم بالطلاب
         const studentNameInput = document.getElementById('studentNameInput');
@@ -777,6 +778,11 @@ const allTransitionEffects = [
                 messageBox.classList.remove('show');
             }, 3000);
         }
+
+     // وظيفة لتحديث قائمة الشرائح
+        function clearEditMode() {
+    document.getElementById('editIndex').value = '';
+}
 
         // وظيفة لإضافة صورة إلى سلايد
         function addImage(imageUrl, caption = '', title = '') {
@@ -994,7 +1000,7 @@ function updateSlidesList() {
             thumbnailHtml = `<img src="${slide.imageUrl}" alt="صورة" class="slide-thumbnail">`;
         }
 
-        // ⭐️ جديد — إضافة اسم التأثير
+        // ⭐️ إضافة اسم التأثير
         let effectName = slide.effect ? slide.effect : 'عشوائي';
         slideText += ` (تأثير: ${effectName})`;
 
@@ -1014,9 +1020,10 @@ function updateSlidesList() {
 
                 <!-- أزرار التحكم -->
                 <div class="flex gap-1 mt-1">
+                    <button class="edit-btn bg-yellow-500 hover:bg-yellow-600" data-index="${index}" title="تحرير الشريحة">✏️</button>
                     <button class="move-btn bg-blue-500 hover:bg-blue-600" data-index="${index}" data-direction="up" title="نقل للأعلى">⬆️</button>
                     <button class="move-btn bg-blue-500 hover:bg-blue-600" data-index="${index}" data-direction="down" title="نقل للأسفل">⬇️</button>
-                    <button class="bg-red-600 hover:bg-red-700" data-index="${index}" title="حذف الشريحة">🗑️</button>
+                    <button class="delete-btn bg-red-600 hover:bg-red-700" data-index="${index}" title="حذف الشريحة">🗑️</button>
                 </div>
             </div>
         `;
@@ -1024,45 +1031,99 @@ function updateSlidesList() {
         slidesList.appendChild(slideItem);
     });
 
-    // مستمع الأزرار (حذف - نقل)
-    slidesList.querySelectorAll('button').forEach(button => {
+    // مستمع أزرار تحرير
+    slidesList.querySelectorAll('.edit-btn').forEach(button => {
         button.addEventListener('click', (e) => {
             const index = parseInt(e.target.dataset.index);
-            
-            if (e.target.textContent.includes('🗑️')) { // حذف
+            const slide = slides[index];
+
+            if (slide.type === 'student') {
+                studentNameInput.value = slide.name;
+                studentCommentInput.value = slide.comment;
+                studentImageUrlInput.value = slide.imageUrl;
+                studentImageShapeInput.value = slide.imageShape;
+                studentPreview.src = slide.imageUrl;
+                studentPreview.style.display = 'block';
+            } else if (slide.type === 'text') {
+                textTitleInput.value = slide.title;
+                textCommentInput.value = slide.comment;
+            } else if (slide.type === 'image') {
+                imageUrlInput.value = slide.imageUrl;
+                imageCaptionInput.value = slide.caption;
+                imageTitleInput.value = slide.title;
+                imagePreview.src = slide.imageUrl;
+                imagePreview.style.display = 'block';
+            }
+
+            document.getElementById('editIndex').value = index;
+            settingsPanel.classList.add('open');
+            displayMessage(`جاري تحرير الشريحة رقم ${index + 1}.`);
+        });
+    });
+
+    // مستمع أزرار الحذف / النقل
+    slidesList.querySelectorAll('.delete-btn, .move-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const index = parseInt(e.target.dataset.index);
+
+            if (e.target.classList.contains('delete-btn')) {
                 slides.splice(index, 1);
+
                 if (currentSlideIndex >= slides.length && slides.length > 0) {
                     currentSlideIndex = slides.length - 1;
                 } else if (slides.length === 0) {
                     currentSlideIndex = 0;
                 }
+
+                updateSlidesList();
+                showSlide(currentSlideIndex);
                 displayMessage('تم حذف الشريحة.');
-            } else if (e.target.dataset.direction === 'up') { // للأعلى
+            }
+            else if (e.target.dataset.direction === 'up') {
                 if (index > 0) {
                     [slides[index], slides[index - 1]] = [slides[index - 1], slides[index]];
+
                     if (currentSlideIndex === index) currentSlideIndex--;
                     else if (currentSlideIndex === index - 1) currentSlideIndex++;
+
+                    updateSlidesList();
+                    showSlide(currentSlideIndex);
                     displayMessage('تم نقل الشريحة للأعلى.');
                 } else {
                     displayMessage('هذه الشريحة بالفعل في الأعلى.', true);
                 }
-            } else if (e.target.dataset.direction === 'down') { // للأسفل
+            }
+            else if (e.target.dataset.direction === 'down') {
                 if (index < slides.length - 1) {
                     [slides[index], slides[index + 1]] = [slides[index + 1], slides[index]];
+
                     if (currentSlideIndex === index) currentSlideIndex++;
                     else if (currentSlideIndex === index + 1) currentSlideIndex--;
+
+                    updateSlidesList();
+                    showSlide(currentSlideIndex);
                     displayMessage('تم نقل الشريحة للأسفل.');
                 } else {
                     displayMessage('هذه الشريحة بالفعل في الأسفل.', true);
                 }
             }
-
-            updateSlidesList();
-            showSlide(currentSlideIndex);
         });
     });
 
-    // ⭐️ جديد — مستمع للقائمة المنسدلة (select)
+    // مستمع تحديث التأثير
+    slidesList.querySelectorAll('.effect-selector').forEach(selector => {
+        selector.addEventListener('change', (e) => {
+            const index = parseInt(e.target.dataset.index);
+            const selectedEffect = e.target.value || null;
+            slides[index].effect = selectedEffect;
+            displayMessage(`تم تحديث تأثير الشريحة رقم ${index + 1} إلى: ${selectedEffect || 'عشوائي'}.`);
+            showSlide(currentSlideIndex);
+        });
+    });
+}
+
+    
+// ⭐️ جديد — مستمع للقائمة المنسدلة (select)
     slidesList.querySelectorAll('.effect-selector').forEach(selector => {
         selector.addEventListener('change', (e) => {
             const index = parseInt(e.target.dataset.index);
@@ -1076,7 +1137,6 @@ function updateSlidesList() {
     // تحديث العرض والمؤقت
     showSlide(currentSlideIndex);
     startSlideshow();
-}
 
 function updateNavigationControls() {
     // ⭐ تحديث المؤشرات (النقاط)
@@ -1351,6 +1411,63 @@ function updateBackground() {
     }
 }
 
+// دالة لتحميل الإعدادات من كائن JS (مستخدمة سواء في fetch أو عند رفع ملف)
+function loadSettingsFromObject(importedSettings) {
+    if (importedSettings && Array.isArray(importedSettings.slides)) {
+        slides = [];
+        importedSettings.slides.forEach(s => {
+            // لو الشرائح القديمة ما فيها "effect" → ضع "fade-in" كافتراضي
+            if (!s.effect || !allTransitionEffects.includes(s.effect)) {
+                s.effect = 'fade-in';
+            }
+            slides.push(s);
+        });
+
+        currentSlideIndex = importedSettings.currentSlideIndex || 0;
+
+        // استعادة الخلفية
+        if (importedSettings.background && importedSettings.background.url) {
+            backgroundImageUrlInput.value = importedSettings.background.url;
+            updateBackground();
+        }
+
+        // استعادة إعدادات الموسيقى
+        if (importedSettings.music) {
+            backgroundMusicUrlInput.value = importedSettings.music.url || '';
+            musicVolumeControl.value = importedSettings.music.volume || 0.5;
+            volumeValue.textContent = `${Math.round((importedSettings.music.volume || 0.5) * 100)}%`;
+            if (importedSettings.music.url) {
+                backgroundMusicElement.src = importedSettings.music.url;
+            }
+        }
+
+        // استعادة إعدادات التذييل
+        if (importedSettings.footer) {
+            footerTextInput.value = importedSettings.footer.text || '';
+            footerTextColorInput.value = importedSettings.footer.textColor || '#FFFFFF';
+            footerBgColorInput.value = importedSettings.footer.bgColor || '#000000';
+            updateFooter();
+        }
+
+        if (importedSettings.slideDuration) {
+            slideDurationInput.value = importedSettings.slideDuration;
+        }
+
+        if (importedSettings.transitionEffects && Array.isArray(importedSettings.transitionEffects)) {
+            selectedTransitionEffects = importedSettings.transitionEffects;
+        }
+
+        updateSlidesList();
+        showSlide(currentSlideIndex);
+        startSlideshow();
+
+        displayMessage('تم تحميل الإعدادات بنجاح!');
+    } else {
+        displayMessage('ملف الإعدادات لا يحتوي على بيانات صالحة.', true);
+    }
+}
+
+
         // دالة لتحميل الإعدادات من ملف يختاره المستخدم
 function loadSettingsFromFile(event) {
     const file = event.target.files[0];
@@ -1364,60 +1481,7 @@ function loadSettingsFromFile(event) {
     reader.onload = (e) => {
         try {
             const importedSettings = JSON.parse(e.target.result);
-
-if (importedSettings && Array.isArray(importedSettings.slides)) {
-    slides = [];
-    importedSettings.slides.forEach(s => {
-        // لو الشرائح القديمة ما فيها "effect" → ضع "fade-in" كافتراضي
-        if (!s.effect || !allTransitionEffects.includes(s.effect)) {
-            s.effect = 'fade-in';
-        }
-        slides.push(s);
-    });
-
-
-                currentSlideIndex = importedSettings.currentSlideIndex || 0;
-
-                // استعادة الخلفية
-                if (importedSettings.background && importedSettings.background.url) {
-                    backgroundImageUrlInput.value = importedSettings.background.url;
-                    updateBackground();
-                }
-
-                // استعادة إعدادات الموسيقى
-                if (importedSettings.music) {
-                    backgroundMusicUrlInput.value = importedSettings.music.url || '';
-                    musicVolumeControl.value = importedSettings.music.volume || 0.5;
-                    volumeValue.textContent = `${Math.round((importedSettings.music.volume || 0.5) * 100)}%`;
-                    if (importedSettings.music.url) {
-                        backgroundMusicElement.src = importedSettings.music.url;
-                    }
-                }
-
-                // استعادة إعدادات التذييل
-                if (importedSettings.footer) {
-                    footerTextInput.value = importedSettings.footer.text || '';
-                    footerTextColorInput.value = importedSettings.footer.textColor || '#FFFFFF';
-                    footerBgColorInput.value = importedSettings.footer.bgColor || '#000000';
-                    updateFooter();
-                }
-
-                if (importedSettings.slideDuration) {
-                    slideDurationInput.value = importedSettings.slideDuration;
-                }
-
-                if (importedSettings.transitionEffects && Array.isArray(importedSettings.transitionEffects)) {
-                    selectedTransitionEffects = importedSettings.transitionEffects;
-                }
-
-                updateSlidesList();
-                showSlide(currentSlideIndex);
-                startSlideshow();
-
-                displayMessage('تم تحميل الإعدادات من الملف بنجاح!');
-            } else {
-                displayMessage('ملف JSON الذي تم تحميله غير صالح أو لا يحتوي على بيانات الشرائح.', true);
-            }
+            loadSettingsFromObject(importedSettings); // ✅ استدعاء الدالة العامة
         } catch (error) {
             console.error('خطأ في تحليل ملف JSON:', error);
             displayMessage('حدث خطأ أثناء تحميل الملف. تأكد من أنه ملف JSON صالح.', true);
@@ -1430,6 +1494,7 @@ if (importedSettings && Array.isArray(importedSettings.slides)) {
 
     reader.readAsText(file);
 }
+
 
         // دالة لحفظ الإعدادات الحالية إلى ملف JSON يمكن تنزيله
             function exportCurrentSettings() {
@@ -1965,7 +2030,7 @@ handleFileUpload(backgroundMusicFileInput, backgroundMusicUrlInput);
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ✅ تهيئة الشرائح
+        // ✅ تهيئة الشرائح
     slides = [];
     currentSlideIndex = 0;
 
@@ -2027,50 +2092,114 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('generateFinalBtn').addEventListener('click', generateFinalVersion);
 
-    addStudentBtn.addEventListener('click', () => {
-        const name = studentNameInput.value.trim();
-        const comment = studentCommentInput.value.trim();
-        const imageUrl = studentImageUrlInput.value.trim();
-        const imageShape = studentImageShapeInput.value;
-        if (name && imageUrl) {
-            addStudent(name, comment, imageUrl, imageShape);
-            studentNameInput.value = '';
-            studentCommentInput.value = '';
-            studentImageUrlInput.value = '';
-            studentFileInput.value = '';
-            studentPreview.style.display = 'none';
-        } else {
-            displayMessage('الرجاء إدخال اسم الطالب ورابط الصورة.', true);
-        }
-    });
+addStudentBtn.addEventListener('click', () => {
+    const name = studentNameInput.value.trim();
+    const comment = studentCommentInput.value.trim();
+    const imageUrl = studentImageUrlInput.value.trim();
+    const imageShape = studentImageShapeInput.value;
+    const editIdx = document.getElementById('editIndex').value;
 
-    addTextSlideBtn.addEventListener('click', () => {
-        const title = textTitleInput.value.trim();
-        const comment = textCommentInput.value.trim();
-        if (title || comment) {
-            addTextSlide(title, comment);
-            textTitleInput.value = '';
-            textCommentInput.value = '';
-        } else {
-            displayMessage('الرجاء إدخال عنوان أو نص للشريحة.', true);
-        }
-    });
+    if (name && imageUrl) {
+        const newSlide = {
+            type: 'student',
+            name: name,
+            comment: comment,
+            imageUrl: imageUrl,
+            imageShape: imageShape,
+            effect: selectedTransitionEffects[0]
+        };
 
-    addImageBtn.addEventListener('click', () => {
-        const url = imageUrlInput.value.trim();
-        const caption = imageCaptionInput.value.trim();
-        const imgTitle = imageTitleInput.value.trim();
-        if (url) {
-            addImage(url, caption, imgTitle);
-            imageUrlInput.value = '';
-            imageCaptionInput.value = '';
-            imageTitleInput.value = '';
-            imageFileInput.value = '';
-            imagePreview.style.display = 'none';
+        if (editIdx !== '') {
+            slides[editIdx] = newSlide;
+            displayMessage(`تم تحديث الشريحة رقم ${parseInt(editIdx) + 1}.`);
         } else {
-            displayMessage('الرجاء إدخال رابط الصورة.', true);
+            slides.push(newSlide);
+            displayMessage('تم إضافة شريحة طالب بنجاح.');
         }
-    });
+
+        // تنظيف:
+        clearEditMode();
+        studentNameInput.value = '';
+        studentCommentInput.value = '';
+        studentImageUrlInput.value = '';
+        studentFileInput.value = '';
+        studentPreview.style.display = 'none';
+
+        updateSlidesList();
+    } else {
+        displayMessage('الرجاء إدخال اسم الطالب ورابط الصورة.', true);
+    }
+});
+
+
+addTextSlideBtn.addEventListener('click', () => {
+    const title = textTitleInput.value.trim();
+    const comment = textCommentInput.value.trim();
+    const editIdx = document.getElementById('editIndex').value;
+
+    if (title || comment) {
+        const newSlide = {
+            type: 'text',
+            title: title,
+            comment: comment,
+            effect: selectedTransitionEffects[0]
+        };
+
+        if (editIdx !== '') {
+            slides[editIdx] = newSlide;
+            displayMessage(`تم تحديث الشريحة رقم ${parseInt(editIdx) + 1}.`);
+        } else {
+            slides.push(newSlide);
+            displayMessage('تم إضافة شريحة نصية بنجاح.');
+        }
+
+        // تنظيف:
+        clearEditMode();
+        textTitleInput.value = '';
+        textCommentInput.value = '';
+
+        updateSlidesList();
+    } else {
+        displayMessage('الرجاء إدخال عنوان أو نص للشريحة.', true);
+    }
+});
+
+addImageBtn.addEventListener('click', () => {
+    const url = imageUrlInput.value.trim();
+    const caption = imageCaptionInput.value.trim();
+    const imgTitle = imageTitleInput.value.trim();
+    const editIdx = document.getElementById('editIndex').value;
+
+    if (url) {
+        const newSlide = {
+            type: 'image',
+            imageUrl: url,
+            caption: caption,
+            title: imgTitle,
+            effect: selectedTransitionEffects[0]
+        };
+
+        if (editIdx !== '') {
+            slides[editIdx] = newSlide;
+            displayMessage(`تم تحديث الشريحة رقم ${parseInt(editIdx) + 1}.`);
+        } else {
+            slides.push(newSlide);
+            displayMessage('تم إضافة شريحة صورة بنجاح.');
+        }
+
+        // تنظيف:
+        clearEditMode();
+        imageUrlInput.value = '';
+        imageCaptionInput.value = '';
+        imageTitleInput.value = '';
+        imageFileInput.value = '';
+        imagePreview.style.display = 'none';
+
+        updateSlidesList();
+    } else {
+        displayMessage('الرجاء إدخال رابط الصورة.', true);
+    }
+});
 
     pauseMusicBtn.addEventListener('click', () => {
         backgroundMusicElement.pause();
